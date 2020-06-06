@@ -5,6 +5,7 @@ import { Map, TileLayer, Marker } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../services/api';
 import axios from 'axios'
+import DropZone from '../../components/Dropzone/index'
 
 import './style.css';
 
@@ -44,6 +45,7 @@ const CreatePoint: React.FC = () => {
     const [selectedCity, setSelectedCity] = useState('0');
     const [selectedPosition, setSelectedPosition] = useState<[number, number]>([0, 0]);
     const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [selectedFile, setSelectedFile] = useState<File>()
 
     const history = useHistory();
 
@@ -64,17 +66,9 @@ const CreatePoint: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
+        axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados?orderBy=nome')
             .then(response => {
-                console.log(response);
-                setUf(response.data);
-            })
-    }, []);
-
-    useEffect(() => {
-        axios.get('https://servicodados.ibge.gov.br/api/v1/localidades/estados')
-            .then(response => {
-                console.log(response);
+                console.log(response.data);
                 setUf(response.data);
             })
     }, []);
@@ -126,22 +120,26 @@ const CreatePoint: React.FC = () => {
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
 
+        console.log(selectedFile)
+
         const { name, email, whatsapp } = formData;
         const uf = selectedUf;
         const city = selectedCity;
         const [latitude, longitude] = selectedPosition;
         const items = selectedItems;
 
-        const data = {
-            name,
-            email,
-            whatsapp,
-            uf,
-            city,
-            latitude,
-            longitude,
-            items
-        }
+        const data = new FormData()
+        
+            data.append('name', name)
+            data.append('email', email)
+            data.append('whatsapp', whatsapp)
+            data.append('uf', uf)
+            data.append('city', city)
+            data.append('latitude', String(latitude))
+            data.append('longitude', String(longitude))
+            data.append('items', String(items))
+            if (selectedFile) data.append('image', selectedFile)
+        
 
         console.log(data)
 
@@ -166,7 +164,10 @@ const CreatePoint: React.FC = () => {
                     Cadastro do <br /> ponto de Coleta
             </h1>
 
+                    <DropZone onFileUploaded={setSelectedFile} />
                 <fieldset>
+
+
                     <legend>
                         <h2>Dados</h2>
                     </legend>
