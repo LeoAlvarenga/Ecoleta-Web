@@ -1,6 +1,6 @@
 import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { Link, useHistory } from 'react-router-dom';
-import { FiArrowLeft } from 'react-icons/fi';
+import { FiArrowLeft, FiCheckCircle } from 'react-icons/fi';
 import { Map, TileLayer, Marker } from 'react-leaflet';
 import { LeafletMouseEvent } from 'leaflet';
 import api from '../../services/api';
@@ -117,6 +117,13 @@ const CreatePoint: React.FC = () => {
         ])
     }
 
+    function showModal() {
+        const modal = document.getElementById('modal')
+        const header = document.getElementById('header')
+        header?.scrollIntoView()
+        modal?.classList.remove("hide")
+    }
+
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
 
@@ -129,28 +136,29 @@ const CreatePoint: React.FC = () => {
         const items = selectedItems;
 
         const data = new FormData()
-        
-            data.append('name', name)
-            data.append('email', email)
-            data.append('whatsapp', whatsapp)
-            data.append('uf', uf)
-            data.append('city', city)
-            data.append('latitude', String(latitude))
-            data.append('longitude', String(longitude))
-            data.append('items', String(items))
-            if (selectedFile) data.append('image', selectedFile)
-        
+
+        data.append('name', name)
+        data.append('email', email)
+        data.append('whatsapp', whatsapp)
+        data.append('uf', uf)
+        data.append('city', city)
+        data.append('latitude', String(latitude))
+        data.append('longitude', String(longitude))
+        data.append('items', String(items))
+        if (selectedFile) data.append('image', selectedFile)
+
 
         console.log(data)
 
         await api.post('/points', data);
 
-        history.push('/');
+        showModal()
+        setTimeout(() => history.push('/'),2000)
     }
 
     return (
         <div id="page-create-point">
-            <header>
+            <header id="header">
                 <img src={logo} alt="logo" />
 
                 <Link to='/'>
@@ -164,7 +172,7 @@ const CreatePoint: React.FC = () => {
                     Cadastro do <br /> ponto de Coleta
             </h1>
 
-                    <DropZone onFileUploaded={setSelectedFile} />
+                <DropZone onFileUploaded={setSelectedFile} />
                 <fieldset>
 
 
@@ -179,6 +187,7 @@ const CreatePoint: React.FC = () => {
                             name="name"
                             id="name"
                             onChange={handleInputChange}
+                            autoComplete="none"
                         />
                     </div>
 
@@ -189,6 +198,7 @@ const CreatePoint: React.FC = () => {
                             name="email"
                             id="email"
                             onChange={handleInputChange}
+                            autoComplete="none"
                         />
                     </div>
 
@@ -199,6 +209,7 @@ const CreatePoint: React.FC = () => {
                             name="whatsapp"
                             id="whatsapp"
                             onChange={handleInputChange}
+                            autoComplete="none"
                         />
                     </div>
                 </fieldset>
@@ -268,7 +279,14 @@ const CreatePoint: React.FC = () => {
                     Cadastrar ponto de Coleta
             </button>
             </form>
+
+            <div className="modal hide" id="modal">
+                <div className="content">
+                    <FiCheckCircle size="100" color="2FB86E"/>
+                </div>
+            </div>
         </div>
+
     );
 }
 
