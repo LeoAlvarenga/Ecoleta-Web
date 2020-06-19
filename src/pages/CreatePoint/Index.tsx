@@ -91,8 +91,9 @@ const CreatePoint: React.FC = () => {
     }
 
     function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
+        // name and value of the input
         const { name, value } = event.target;
-
+        // name of the input in []
         setFormData({ ...formData, [name]: value })
     }
 
